@@ -48,6 +48,7 @@ contract AdministeredAgent is IAdministeredAgent {
     /**********************************************************************************************/
 
     function addAdmin(address account) external override onlyAdmin {
+        require(account != address(0), ZeroAccount());
         _addAdmin(account);
     }
 
@@ -57,6 +58,7 @@ contract AdministeredAgent is IAdministeredAgent {
     }
 
     function addGrantor(address account) external override onlyAdmin {
+        require(account != address(0), ZeroAccount());
         require(_grantors.add(account), AlreadyGrantor(account));
         emit GrantorAdded(account, msg.sender);
     }
@@ -67,6 +69,7 @@ contract AdministeredAgent is IAdministeredAgent {
     }
 
     function addRevoker(address account) external override onlyAdmin {
+        require(account != address(0), ZeroAccount());
         require(_revokers.add(account), AlreadyRevoker(account));
         emit RevokerAdded(account, msg.sender);
     }
@@ -77,6 +80,7 @@ contract AdministeredAgent is IAdministeredAgent {
     }
 
     function addActor(address account) external override {
+        require(account != address(0), ZeroAccount());
         require(_admins.contains(msg.sender) || _grantors.contains(msg.sender), NotGrantor());
         require(_actors.add(account), AlreadyActor(account));
         emit ActorAdded(account, msg.sender);
@@ -167,6 +171,12 @@ contract AdministeredAgent is IAdministeredAgent {
     function isRevoker(address account) external view override returns (bool) {
         return _revokers.contains(account);
     }
+
+    /**********************************************************************************************/
+    /*** Receive Function                                                                       ***/
+    /**********************************************************************************************/
+
+    receive() external payable {}
 
     /**********************************************************************************************/
     /*** Internal Interactive Functions                                                         ***/

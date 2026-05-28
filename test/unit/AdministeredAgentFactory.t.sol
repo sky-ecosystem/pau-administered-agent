@@ -3,13 +3,12 @@ pragma solidity ^0.8.34;
 
 import { Test } from "../../lib/forge-std/src/Test.sol";
 
-import { IAdministeredAgent } from "../../src/interfaces/IAdministeredAgent.sol";
+import { IAdministeredAgent }        from "../../src/interfaces/IAdministeredAgent.sol";
+import { IAdministeredAgentFactory } from "../../src/interfaces/IAdministeredAgentFactory.sol";
 
 import { AdministeredAgentFactory } from "../../src/AdministeredAgentFactory.sol";
 
 contract AdministeredActor_Tests is Test {
-
-    bytes32 internal constant DEFAULT_ADMIN_ROLE = 0x00;
 
     AdministeredAgentFactory internal factory;
 
@@ -24,6 +23,9 @@ contract AdministeredActor_Tests is Test {
     function test_deploy() external {
         address admin = makeAddr("admin");
         uint256 nonce = vm.getNonce(address(factory));
+
+        vm.expectEmit(address(factory));
+        emit IAdministeredAgentFactory.AdministeredAgentDeployed(vm.computeCreateAddress(address(factory), nonce));
 
         assertEq(factory.deploy(admin), vm.computeCreateAddress(address(factory), nonce));
     }

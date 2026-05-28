@@ -130,6 +130,13 @@ contract AdministeredActor_Tests is Test {
         administeredActor.addAdmin(otherAdmin);
     }
 
+    function test_addAdmin_zeroAccount() external {
+        vm.expectRevert(IAdministeredAgent.ZeroAccount.selector);
+
+        vm.prank(admin);
+        administeredActor.addAdmin(address(0));
+    }
+
     function test_addAdmin_alreadyAdmin() external {
         vm.expectRevert(abi.encodeWithSelector(IAdministeredAgent.AlreadyAdmin.selector, admin));
 
@@ -190,6 +197,13 @@ contract AdministeredActor_Tests is Test {
 
         vm.prank(unauthorized);
         administeredActor.addGrantor(grantor);
+    }
+
+    function test_addGrantor_zeroAccount() external {
+        vm.expectRevert(IAdministeredAgent.ZeroAccount.selector);
+
+        vm.prank(admin);
+        administeredActor.addGrantor(address(0));
     }
 
     function test_addGrantor_alreadyGrantor() external {
@@ -255,6 +269,13 @@ contract AdministeredActor_Tests is Test {
         administeredActor.addRevoker(revoker);
     }
 
+    function test_addRevoker_zeroAccount() external {
+        vm.expectRevert(IAdministeredAgent.ZeroAccount.selector);
+
+        vm.prank(admin);
+        administeredActor.addRevoker(address(0));
+    }
+
     function test_addRevoker_alreadyRevoker() external {
         administeredActor.__addRevoker(revoker);
 
@@ -316,6 +337,13 @@ contract AdministeredActor_Tests is Test {
 
         vm.prank(unauthorized);
         administeredActor.addActor(actor);
+    }
+
+    function test_addActor_zeroAccount() external {
+        vm.expectRevert(IAdministeredAgent.ZeroAccount.selector);
+
+        vm.prank(admin);
+        administeredActor.addActor(address(0));
     }
 
     function test_addActor_alreadyActor() external {

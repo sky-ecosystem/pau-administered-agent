@@ -87,6 +87,9 @@ interface IAdministeredAgent {
     /// @notice Thrown when the array lengths are mismatched.
     error MismatchedArrayLengths();
 
+    /// @notice Thrown when the account is the zero address.
+    error ZeroAccount();
+
     /// @notice Thrown when the caller is not an actor.
     error NotActor();
 
