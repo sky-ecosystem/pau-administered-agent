@@ -217,14 +217,14 @@ interface IAdministeredAgent {
 
     /**
      * @notice Returns a grantor at a given index.
-     * @param  index The index of the grantor to return.
+     * @param  index   The index of the grantor to return.
      * @return grantor The grantor at the given index.
      */
     function getGrantor(uint256 index) external view returns (address grantor);
 
     /**
      * @notice Returns a revoker at a given index.
-     * @param  index The index of the revoker to return.
+     * @param  index   The index of the revoker to return.
      * @return revoker The revoker at the given index.
      */
     function getRevoker(uint256 index) external view returns (address revoker);
@@ -232,29 +232,29 @@ interface IAdministeredAgent {
     /**
      * @notice Returns true if the account is an actor.
      * @param  account The account to check if it is an actor.
-     * @return accountIsActor True if the account is an actor, false otherwise.
+     * @return isActor True if the account is an actor, false otherwise.
      */
-    function isActor(address account) external view returns (bool accountIsActor);
+    function getIsActor(address account) external view returns (bool isActor);
 
     /**
      * @notice Returns true if the account is an admin.
      * @param  account The account to check if it is an admin.
-     * @return accountIsAdmin True if the account is an admin, false otherwise.
+     * @return isAdmin True if the account is an admin, false otherwise.
      */
-    function isAdmin(address account) external view returns (bool accountIsAdmin);
+    function getIsAdmin(address account) external view returns (bool isAdmin);
 
     /**
      * @notice Returns true if the account is a grantor.
-     * @param  account The account to check if it is a grantor.
-     * @return accountIsGrantor True if the account is a grantor, false otherwise.
+     * @param  account   The account to check if it is a grantor.
+     * @return isGrantor True if the account is a grantor, false otherwise.
      */
-    function isGrantor(address account) external view returns (bool accountIsGrantor);
+    function getIsGrantor(address account) external view returns (bool isGrantor);
 
     /**
      * @notice Returns true if the account is a revoker.
-     * @param  account The account to check if it is a revoker.
-     * @return accountIsRevoker True if the account is a revoker, false otherwise.
+     * @param  account   The account to check if it is a revoker.
+     * @return isRevoker True if the account is a revoker, false otherwise.
      */
-    function isRevoker(address account) external view returns (bool accountIsRevoker);
+    function getIsRevoker(address account) external view returns (bool isRevoker);
 
 }

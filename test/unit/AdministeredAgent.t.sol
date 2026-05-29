@@ -444,7 +444,7 @@ contract AdministeredActor_Tests is Test {
 
         bytes memory data = hex"12345678";
 
-        vm.mockCall(target, data, "");
+        vm.mockCall(target,   data, "");
         vm.expectCall(target, data);
 
         vm.prank(actor);
@@ -460,7 +460,7 @@ contract AdministeredActor_Tests is Test {
 
         vm.deal(actor, 1 ether);
 
-        vm.mockCall(target, 0.5 ether, data, "");
+        vm.mockCall(target,   0.5 ether, data, "");
         vm.expectCall(target, 0.5 ether, data);
 
         vm.prank(actor);
@@ -700,48 +700,48 @@ contract AdministeredActor_Tests is Test {
     }
 
     /**********************************************************************************************/
-    /*** isAdmin Tests                                                                          ***/
+    /*** getIsAdmin Tests                                                                       ***/
     /**********************************************************************************************/
 
-    function test_isAdmin() external view {
-        assertEq(administeredActor.isAdmin(admin),        true);
-        assertEq(administeredActor.isAdmin(unauthorized), false);
+    function test_getIsAdmin() external view {
+        assertEq(administeredActor.getIsAdmin(admin),        true);
+        assertEq(administeredActor.getIsAdmin(unauthorized), false);
     }
 
     /**********************************************************************************************/
-    /*** isActor Tests                                                                          ***/
+    /*** getIsActor Tests                                                                       ***/
     /**********************************************************************************************/
 
-    function test_isActor() external {
-        assertEq(administeredActor.isActor(actor), false);
+    function test_getIsActor() external {
+        assertEq(administeredActor.getIsActor(actor), false);
 
         administeredActor.__addActor(actor);
 
-        assertEq(administeredActor.isActor(actor), true);
+        assertEq(administeredActor.getIsActor(actor), true);
     }
 
     /**********************************************************************************************/
-    /*** isGrantor Tests                                                                        ***/
+    /*** getIsGrantor Tests                                                                     ***/
     /**********************************************************************************************/
 
-    function test_isGrantor() external {
-        assertEq(administeredActor.isGrantor(grantor), false);
+    function test_getIsGrantor() external {
+        assertEq(administeredActor.getIsGrantor(grantor), false);
 
         administeredActor.__addGrantor(grantor);
 
-        assertEq(administeredActor.isGrantor(grantor), true);
+        assertEq(administeredActor.getIsGrantor(grantor), true);
     }
 
     /**********************************************************************************************/
-    /*** isRevoker Tests                                                                        ***/
+    /*** getIsRevoker Tests                                                                     ***/
     /**********************************************************************************************/
 
-    function test_isRevoker() external {
-        assertEq(administeredActor.isRevoker(revoker), false);
+    function test_getIsRevoker() external {
+        assertEq(administeredActor.getIsRevoker(revoker), false);
 
         administeredActor.__addRevoker(revoker);
 
-        assertEq(administeredActor.isRevoker(revoker), true);
+        assertEq(administeredActor.getIsRevoker(revoker), true);
     }
 
 }

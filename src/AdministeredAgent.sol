@@ -156,19 +156,19 @@ contract AdministeredAgent is IAdministeredAgent {
         return _revokers.at(index);
     }
 
-    function isAdmin(address account) external view override returns (bool) {
+    function getIsAdmin(address account) external view override returns (bool) {
         return _admins.contains(account);
     }
 
-    function isActor(address account) external view override returns (bool) {
+    function getIsActor(address account) external view override returns (bool) {
         return _actors.contains(account);
     }
 
-    function isGrantor(address account) external view override returns (bool) {
+    function getIsGrantor(address account) external view override returns (bool) {
         return _grantors.contains(account);
     }
 
-    function isRevoker(address account) external view override returns (bool) {
+    function getIsRevoker(address account) external view override returns (bool) {
         return _revokers.contains(account);
     }
 
