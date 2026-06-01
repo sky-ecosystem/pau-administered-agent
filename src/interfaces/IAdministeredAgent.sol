@@ -138,17 +138,20 @@ interface IAdministeredAgent {
      * @param  targets The target contracts to call.
      * @param  data    The data to call the target contracts with.
      * @param  values  The values to call the target contracts with.
+     * @return results The respective results of the calls.
      */
     function batchCall(address[] memory targets, bytes[] memory data, uint256[] memory values)
         external
-        payable;
+        payable
+        returns (bytes[] memory results);
 
     /**
      * @notice Calls a target contract with data.
      * @param  target The target contract to call.
      * @param  data   The data to call the target contract with.
+     * @return result The result of the call.
      */
-    function call(address target, bytes memory data) external payable;
+    function call(address target, bytes memory data) external payable returns (bytes memory result);
 
     /**
      * @notice Removes an account as an actor.

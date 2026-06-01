@@ -131,7 +131,7 @@ contract AdministeredActor_Tests is Test {
     }
 
     function test_addAdmin_zeroAccount() external {
-        vm.expectRevert(IAdministeredAgent.ZeroAccount.selector);
+        vm.expectRevert(IAdministeredAgent.ZeroAdmin.selector);
 
         vm.prank(admin);
         administeredActor.addAdmin(address(0));
@@ -145,6 +145,9 @@ contract AdministeredActor_Tests is Test {
     }
 
     function test_addAdmin() external {
+        assertEq(administeredActor.adminCount(),          1);
+        assertEq(administeredActor.__isAdmin(otherAdmin), false);
+
         vm.expectEmit(address(administeredActor));
         emit IAdministeredAgent.AdminAdded(otherAdmin, admin);
 
@@ -153,7 +156,6 @@ contract AdministeredActor_Tests is Test {
 
         assertEq(administeredActor.adminCount(),          2);
         assertEq(administeredActor.__isAdmin(otherAdmin), true);
-        assertEq(administeredActor.__getAdmin(1),         otherAdmin);
     }
 
     /**********************************************************************************************/
@@ -177,6 +179,9 @@ contract AdministeredActor_Tests is Test {
     function test_removeAdmin() external {
         administeredActor.__addAdmin(otherAdmin);
 
+        assertEq(administeredActor.adminCount(),          2);
+        assertEq(administeredActor.__isAdmin(otherAdmin), true);
+
         vm.expectEmit(address(administeredActor));
         emit IAdministeredAgent.AdminRemoved(otherAdmin, admin);
 
@@ -185,7 +190,6 @@ contract AdministeredActor_Tests is Test {
 
         assertEq(administeredActor.adminCount(),          1);
         assertEq(administeredActor.__isAdmin(otherAdmin), false);
-        assertEq(administeredActor.__getAdmin(0),         admin);
     }
 
     /**********************************************************************************************/
@@ -216,6 +220,9 @@ contract AdministeredActor_Tests is Test {
     }
 
     function test_addGrantor() external {
+        assertEq(administeredActor.grantorCount(),       0);
+        assertEq(administeredActor.__isGrantor(grantor), false);
+
         vm.expectEmit(address(administeredActor));
         emit IAdministeredAgent.GrantorAdded(grantor, admin);
 
@@ -224,7 +231,6 @@ contract AdministeredActor_Tests is Test {
 
         assertEq(administeredActor.grantorCount(),       1);
         assertEq(administeredActor.__isGrantor(grantor), true);
-        assertEq(administeredActor.__getGrantor(0),      grantor);
     }
 
     /**********************************************************************************************/
@@ -247,6 +253,9 @@ contract AdministeredActor_Tests is Test {
 
     function test_removeGrantor() external {
         administeredActor.__addGrantor(grantor);
+
+        assertEq(administeredActor.grantorCount(),       1);
+        assertEq(administeredActor.__isGrantor(grantor), true);
 
         vm.expectEmit(address(administeredActor));
         emit IAdministeredAgent.GrantorRemoved(grantor, admin);
@@ -286,6 +295,9 @@ contract AdministeredActor_Tests is Test {
     }
 
     function test_addRevoker() external {
+        assertEq(administeredActor.revokerCount(),       0);
+        assertEq(administeredActor.__isRevoker(revoker), false);
+
         vm.expectEmit(address(administeredActor));
         emit IAdministeredAgent.RevokerAdded(revoker, admin);
 
@@ -294,7 +306,6 @@ contract AdministeredActor_Tests is Test {
 
         assertEq(administeredActor.revokerCount(),       1);
         assertEq(administeredActor.__isRevoker(revoker), true);
-        assertEq(administeredActor.__getRevoker(0),      revoker);
     }
 
     /**********************************************************************************************/
@@ -317,6 +328,9 @@ contract AdministeredActor_Tests is Test {
 
     function test_removeRevoker() external {
         administeredActor.__addRevoker(revoker);
+
+        assertEq(administeredActor.revokerCount(),       1);
+        assertEq(administeredActor.__isRevoker(revoker), true);
 
         vm.expectEmit(address(administeredActor));
         emit IAdministeredAgent.RevokerRemoved(revoker, admin);
@@ -356,6 +370,9 @@ contract AdministeredActor_Tests is Test {
     }
 
     function test_addActor_asAdmin() external {
+        assertEq(administeredActor.actorCount(),     0);
+        assertEq(administeredActor.__isActor(actor), false);
+
         vm.expectEmit(address(administeredActor));
         emit IAdministeredAgent.ActorAdded(actor, admin);
 
@@ -364,11 +381,13 @@ contract AdministeredActor_Tests is Test {
 
         assertEq(administeredActor.actorCount(),     1);
         assertEq(administeredActor.__isActor(actor), true);
-        assertEq(administeredActor.__getActor(0),    actor);
     }
 
     function test_addActor_asGrantor() external {
         administeredActor.__addGrantor(grantor);
+
+        assertEq(administeredActor.actorCount(),     0);
+        assertEq(administeredActor.__isActor(actor), false);
 
         vm.expectEmit(address(administeredActor));
         emit IAdministeredAgent.ActorAdded(actor, grantor);
@@ -378,7 +397,6 @@ contract AdministeredActor_Tests is Test {
 
         assertEq(administeredActor.actorCount(),     1);
         assertEq(administeredActor.__isActor(actor), true);
-        assertEq(administeredActor.__getActor(0),    actor);
     }
 
     /**********************************************************************************************/
@@ -402,6 +420,9 @@ contract AdministeredActor_Tests is Test {
     function test_removeActor_asAdmin() external {
         administeredActor.__addActor(actor);
 
+        assertEq(administeredActor.actorCount(),     1);
+        assertEq(administeredActor.__isActor(actor), true);
+
         vm.expectEmit(address(administeredActor));
         emit IAdministeredAgent.ActorRemoved(actor, admin);
 
@@ -415,6 +436,9 @@ contract AdministeredActor_Tests is Test {
     function test_removeActor_asRevoker() external {
         administeredActor.__addActor(actor);
         administeredActor.__addRevoker(revoker);
+
+        assertEq(administeredActor.actorCount(),     1);
+        assertEq(administeredActor.__isActor(actor), true);
 
         vm.expectEmit(address(administeredActor));
         emit IAdministeredAgent.ActorRemoved(actor, revoker);
@@ -437,6 +461,21 @@ contract AdministeredActor_Tests is Test {
         administeredActor.call(makeAddr("target"), hex"12345678");
     }
 
+    function test_call_reverts() external {
+        administeredActor.__addActor(actor);
+
+        address target = makeAddr("target");
+
+        bytes memory data = hex"12345678";
+
+        vm.mockCallRevert(target, data, hex"87654321");
+
+        vm.expectRevert(bytes(hex"87654321"));
+
+        vm.prank(actor);
+        administeredActor.call(address(target), data);
+    }
+
     function test_call_withNoValue() external {
         administeredActor.__addActor(actor);
 
@@ -444,11 +483,13 @@ contract AdministeredActor_Tests is Test {
 
         bytes memory data = hex"12345678";
 
-        vm.mockCall(target,   data, "");
+        vm.mockCall(target,   data, hex"87654321");
         vm.expectCall(target, data);
 
         vm.prank(actor);
-        administeredActor.call(address(target), data);
+        bytes memory result = administeredActor.call(address(target), data);
+
+        assertEq(keccak256(result), keccak256(hex"87654321"));
     }
 
     function test_call_withValue() external {
@@ -460,11 +501,13 @@ contract AdministeredActor_Tests is Test {
 
         vm.deal(actor, 1 ether);
 
-        vm.mockCall(target,   0.5 ether, data, "");
+        vm.mockCall(target,   0.5 ether, data, hex"87654321");
         vm.expectCall(target, 0.5 ether, data);
 
         vm.prank(actor);
-        administeredActor.call{ value: 0.5 ether }(address(target), data);
+        bytes memory result = administeredActor.call{ value: 0.5 ether }(address(target), data);
+
+        assertEq(keccak256(result), keccak256(hex"87654321"));
     }
 
     /**********************************************************************************************/
@@ -497,6 +540,49 @@ contract AdministeredActor_Tests is Test {
         administeredActor.batchCall(new address[](1), new bytes[](1), new uint256[](2));
     }
 
+    function test_batchCall_reverts() external {
+        administeredActor.__addActor(actor);
+
+        address[] memory targets = new address[](3);
+        targets[0] = makeAddr("target1");
+        targets[1] = makeAddr("target2");
+        targets[2] = makeAddr("target2");
+
+        bytes[] memory data = new bytes[](3);
+        data[0] = hex"12345678";
+        data[1] = hex"87654321";
+        data[2] = hex"11111111";
+
+        uint256[] memory values = new uint256[](3);
+        values[0] = 0;
+        values[1] = 0;
+        values[2] = 0;
+
+        vm.mockCallRevert(targets[0], data[0], hex"22222222");
+
+        vm.expectRevert(bytes(hex"22222222"));
+
+        vm.prank(actor);
+        administeredActor.batchCall(targets, data, values);
+
+        vm.mockCall(targets[0],       data[0], "");
+        vm.mockCallRevert(targets[1], data[1], hex"33333333");
+
+        vm.expectRevert(bytes(hex"33333333"));
+
+        vm.prank(actor);
+        administeredActor.batchCall(targets, data, values);
+
+        vm.mockCall(targets[0],       data[0], "");
+        vm.mockCall(targets[1],       data[1], "");
+        vm.mockCallRevert(targets[2], data[2], hex"44444444");
+
+        vm.expectRevert(bytes(hex"44444444"));
+
+        vm.prank(actor);
+        administeredActor.batchCall(targets, data, values);
+    }
+
     function test_batchCall_withNoValue() external {
         administeredActor.__addActor(actor);
 
@@ -515,15 +601,21 @@ contract AdministeredActor_Tests is Test {
         values[1] = 0;
         values[2] = 0;
 
-        vm.mockCall(targets[0],   data[0], "");
+        vm.mockCall(targets[0],   data[0], hex"22222222");
         vm.expectCall(targets[0], data[0]);
-        vm.mockCall(targets[1],   data[1], "");
+        vm.mockCall(targets[1],   data[1], hex"33333333");
         vm.expectCall(targets[1], data[1]);
-        vm.mockCall(targets[2],   data[2], "");
+        vm.mockCall(targets[2],   data[2], hex"44444444");
         vm.expectCall(targets[2], data[2]);
 
         vm.prank(actor);
-        administeredActor.batchCall(targets, data, values);
+        bytes[] memory results = administeredActor.batchCall(targets, data, values);
+
+        assertEq(results.length, 3);
+
+        assertEq(keccak256(results[0]), keccak256(hex"22222222"));
+        assertEq(keccak256(results[1]), keccak256(hex"33333333"));
+        assertEq(keccak256(results[2]), keccak256(hex"44444444"));
     }
 
     function test_batchCall_withValue() external {
@@ -546,15 +638,21 @@ contract AdministeredActor_Tests is Test {
 
         vm.deal(actor, 0.7 ether);
 
-        vm.mockCall(targets[0],   0.2 ether, data[0], "");
+        vm.mockCall(targets[0],   0.2 ether, data[0], hex"22222222");
         vm.expectCall(targets[0], 0.2 ether, data[0]);
-        vm.mockCall(targets[1],   0 ether,   data[1], "");
+        vm.mockCall(targets[1],   0 ether,   data[1], hex"33333333");
         vm.expectCall(targets[1], 0 ether,   data[1]);
-        vm.mockCall(targets[2],   0.5 ether, data[2], "");
+        vm.mockCall(targets[2],   0.5 ether, data[2], hex"44444444");
         vm.expectCall(targets[2], 0.5 ether, data[2]);
 
         vm.prank(actor);
-        administeredActor.batchCall{ value: 0.7 ether }(targets, data, values);
+        bytes[] memory results = administeredActor.batchCall{ value: 0.7 ether }(targets, data, values);
+
+        assertEq(results.length, 3);
+
+        assertEq(keccak256(results[0]), keccak256(hex"22222222"));
+        assertEq(keccak256(results[1]), keccak256(hex"33333333"));
+        assertEq(keccak256(results[2]), keccak256(hex"44444444"));
     }
 
     /**********************************************************************************************/

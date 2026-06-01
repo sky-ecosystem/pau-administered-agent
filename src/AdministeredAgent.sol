@@ -38,62 +38,83 @@ contract AdministeredAgent is IAdministeredAgent {
     /**********************************************************************************************/
 
     constructor(address admin) {
-        require(admin != address(0), ZeroAdmin());
-
         _addAdmin(admin);
     }
 
     /**********************************************************************************************/
-    /*** External Interactive Functions                                                         ***/
+    /*** External Interactive Admin Functions                                                   ***/
     /**********************************************************************************************/
 
     function addAdmin(address account) external override onlyAdmin {
-        require(account != address(0), ZeroAccount());
         _addAdmin(account);
     }
 
     function removeAdmin(address account) external override onlyAdmin {
         require(_admins.remove(account), NotAdmin());
+
         emit AdminRemoved(account, msg.sender);
     }
 
     function addGrantor(address account) external override onlyAdmin {
-        require(account != address(0), ZeroAccount());
+        require(account != address(0),  ZeroAccount());
         require(_grantors.add(account), AlreadyGrantor(account));
+
         emit GrantorAdded(account, msg.sender);
     }
 
     function removeGrantor(address account) external override onlyAdmin {
         require(_grantors.remove(account), NotGrantor());
+
         emit GrantorRemoved(account, msg.sender);
     }
 
     function addRevoker(address account) external override onlyAdmin {
-        require(account != address(0), ZeroAccount());
+        require(account != address(0),  ZeroAccount());
         require(_revokers.add(account), AlreadyRevoker(account));
+
         emit RevokerAdded(account, msg.sender);
     }
 
     function removeRevoker(address account) external override onlyAdmin {
         require(_revokers.remove(account), NotRevoker());
+
         emit RevokerRemoved(account, msg.sender);
     }
 
+    /**********************************************************************************************/
+    /*** External Interactive Grantor/Revoker Functions                                         ***/
+    /**********************************************************************************************/
+
     function addActor(address account) external override {
         require(account != address(0), ZeroAccount());
+
         require(_admins.contains(msg.sender) || _grantors.contains(msg.sender), NotGrantor());
+
         require(_actors.add(account), AlreadyActor(account));
+
         emit ActorAdded(account, msg.sender);
     }
 
     function removeActor(address account) external override {
         require(_admins.contains(msg.sender) || _revokers.contains(msg.sender), NotRevoker());
+
         require(_actors.remove(account), NotActor());
+
         emit ActorRemoved(account, msg.sender);
     }
 
-    function call(address target, bytes memory data) external payable override onlyActor {
-        Address.functionCallWithValue(target, data, msg.value);
+    /**********************************************************************************************/
+    /*** External Interactive Actor Functions                                                   ***/
+    /**********************************************************************************************/
+
+    function call(address target, bytes memory data)
+        external
+        payable
+        override
+        onlyActor
+        returns (bytes memory result)
+    {
+        result = Address.functionCallWithValue(target, data, msg.value);
     }
 
     function batchCall(address[] memory targets, bytes[] memory data, uint256[] memory values)
@@ -101,14 +122,17 @@ contract AdministeredAgent is IAdministeredAgent {
         payable
         override
         onlyActor
+        returns (bytes[] memory results)
     {
+        results = new bytes[](targets.length);
+
         require(
             targets.length == data.length && targets.length == values.length,
             MismatchedArrayLengths()
         );
 
         for (uint256 i = 0; i < targets.length; ++i) {
-            Address.functionCallWithValue(targets[i], data[i], values[i]);
+            results[i] = Address.functionCallWithValue(targets[i], data[i], values[i]);
         }
     }
 
@@ -183,7 +207,9 @@ contract AdministeredAgent is IAdministeredAgent {
     /**********************************************************************************************/
 
     function _addAdmin(address account) internal {
-        require(_admins.add(account), AlreadyAdmin(account));
+        require(account != address(0), ZeroAdmin());
+        require(_admins.add(account),  AlreadyAdmin(account));
+
         emit AdminAdded(account, msg.sender);
     }
 
