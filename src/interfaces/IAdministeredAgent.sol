@@ -72,23 +72,35 @@ interface IAdministeredAgent {
     /*** Custom Errors                                                                          ***/
     /**********************************************************************************************/
 
-    /// @notice Thrown when the account is already an actor.
-    error AlreadyActor(address account);
+    /// @notice Thrown when the account argument is already an actor.
+    error AccountAlreadyActor();
 
-    /// @notice Thrown when the account is already an admin.
-    error AlreadyAdmin(address account);
+    /// @notice Thrown when the account argument is already an admin.
+    error AccountAlreadyAdmin();
 
-    /// @notice Thrown when the account is already a grantor.
-    error AlreadyGrantor(address account);
+    /// @notice Thrown when the account argument is already a grantor.
+    error AccountAlreadyGrantor();
 
-    /// @notice Thrown when the account is already a revoker.
-    error AlreadyRevoker(address account);
+    /// @notice Thrown when the account argument is already a revoker.
+    error AccountAlreadyRevoker();
+
+    /// @notice Thrown when the account argument is not an actor.
+    error AccountNotActor();
+
+    /// @notice Thrown when the account argument is not an admin.
+    error AccountNotAdmin();
+
+    /// @notice Thrown when the account argument is not a grantor.
+    error AccountNotGrantor();
+
+    /// @notice Thrown when the account argument is not a revoker.
+    error AccountNotRevoker();
 
     /// @notice Thrown when the array lengths are mismatched.
     error MismatchedArrayLengths();
 
-    /// @notice Thrown when the account is the zero address.
-    error ZeroAccount();
+    /// @notice Thrown when there are no admins remaining.
+    error NoAdminsRemaining();
 
     /// @notice Thrown when the caller is not an actor.
     error NotActor();
@@ -102,8 +114,8 @@ interface IAdministeredAgent {
     /// @notice Thrown when the caller is not a revoker.
     error NotRevoker();
 
-    /// @notice Thrown when the admin is the zero address.
-    error ZeroAdmin();
+    /// @notice Thrown when the account argument is the zero address.
+    error ZeroAccount();
 
     /**********************************************************************************************/
     /*** Interactive Functions                                                                  ***/
@@ -182,7 +194,7 @@ interface IAdministeredAgent {
      * @param  target The target contract to send the value to.
      * @param  value  The value to send to the target contract.
      */
-    function sendValue(address payable target, uint256 value) external payable;
+    function sendValue(address target, uint256 value) external payable;
 
     /**********************************************************************************************/
     /*** Variables                                                                              ***/

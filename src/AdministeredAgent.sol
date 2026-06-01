@@ -14,8 +14,8 @@ contract AdministeredAgent is IAdministeredAgent {
     /*** Declarations                                                                           ***/
     /**********************************************************************************************/
 
-    EnumerableSet.AddressSet internal _admins;
     EnumerableSet.AddressSet internal _actors;
+    EnumerableSet.AddressSet internal _admins;
     EnumerableSet.AddressSet internal _grantors;
     EnumerableSet.AddressSet internal _revokers;
 
@@ -23,13 +23,13 @@ contract AdministeredAgent is IAdministeredAgent {
     /*** Modifiers                                                                              ***/
     /**********************************************************************************************/
 
-    modifier onlyAdmin {
-        _revertIfNotAdmin();
+    modifier onlyActor {
+        require(_actors.contains(msg.sender), NotActor());
         _;
     }
 
-    modifier onlyActor {
-        _revertIfNotActor();
+    modifier onlyAdmin {
+        require(_admins.contains(msg.sender), NotAdmin());
         _;
     }
 
@@ -50,33 +50,34 @@ contract AdministeredAgent is IAdministeredAgent {
     }
 
     function removeAdmin(address account) external override onlyAdmin {
-        require(_admins.remove(account), NotAdmin());
+        require(_admins.remove(account), AccountNotAdmin());
+        require(_admins.length() > 0,    NoAdminsRemaining());
 
         emit AdminRemoved(account, msg.sender);
     }
 
     function addGrantor(address account) external override onlyAdmin {
         require(account != address(0),  ZeroAccount());
-        require(_grantors.add(account), AlreadyGrantor(account));
+        require(_grantors.add(account), AccountAlreadyGrantor());
 
         emit GrantorAdded(account, msg.sender);
     }
 
     function removeGrantor(address account) external override onlyAdmin {
-        require(_grantors.remove(account), NotGrantor());
+        require(_grantors.remove(account), AccountNotGrantor());
 
         emit GrantorRemoved(account, msg.sender);
     }
 
     function addRevoker(address account) external override onlyAdmin {
         require(account != address(0),  ZeroAccount());
-        require(_revokers.add(account), AlreadyRevoker(account));
+        require(_revokers.add(account), AccountAlreadyRevoker());
 
         emit RevokerAdded(account, msg.sender);
     }
 
     function removeRevoker(address account) external override onlyAdmin {
-        require(_revokers.remove(account), NotRevoker());
+        require(_revokers.remove(account), AccountNotRevoker());
 
         emit RevokerRemoved(account, msg.sender);
     }
@@ -86,11 +87,10 @@ contract AdministeredAgent is IAdministeredAgent {
     /**********************************************************************************************/
 
     function addActor(address account) external override {
-        require(account != address(0), ZeroAccount());
-
         require(_admins.contains(msg.sender) || _grantors.contains(msg.sender), NotGrantor());
 
-        require(_actors.add(account), AlreadyActor(account));
+        require(account != address(0), ZeroAccount());
+        require(_actors.add(account),  AccountAlreadyActor());
 
         emit ActorAdded(account, msg.sender);
     }
@@ -98,7 +98,7 @@ contract AdministeredAgent is IAdministeredAgent {
     function removeActor(address account) external override {
         require(_admins.contains(msg.sender) || _revokers.contains(msg.sender), NotRevoker());
 
-        require(_actors.remove(account), NotActor());
+        require(_actors.remove(account), AccountNotActor());
 
         emit ActorRemoved(account, msg.sender);
     }
@@ -136,8 +136,8 @@ contract AdministeredAgent is IAdministeredAgent {
         }
     }
 
-    function sendValue(address payable target, uint256 value) external payable override onlyActor {
-        Address.sendValue(target, value);
+    function sendValue(address target, uint256 value) external payable override onlyActor {
+        Address.sendValue(payable(target), value);
     }
 
     /**********************************************************************************************/
@@ -207,22 +207,10 @@ contract AdministeredAgent is IAdministeredAgent {
     /**********************************************************************************************/
 
     function _addAdmin(address account) internal {
-        require(account != address(0), ZeroAdmin());
-        require(_admins.add(account),  AlreadyAdmin(account));
+        require(account != address(0), ZeroAccount());
+        require(_admins.add(account),  AccountAlreadyAdmin());
 
         emit AdminAdded(account, msg.sender);
-    }
-
-    /**********************************************************************************************/
-    /*** Internal View Functions                                                                ***/
-    /**********************************************************************************************/
-
-    function _revertIfNotAdmin() internal view {
-        require(_admins.contains(msg.sender), NotAdmin());
-    }
-
-    function _revertIfNotActor() internal view {
-        require(_actors.contains(msg.sender), NotActor());
     }
 
 }

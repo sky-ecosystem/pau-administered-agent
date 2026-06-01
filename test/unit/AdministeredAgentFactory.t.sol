@@ -8,7 +8,7 @@ import { IAdministeredAgentFactory } from "../../src/interfaces/IAdministeredAge
 
 import { AdministeredAgentFactory } from "../../src/AdministeredAgentFactory.sol";
 
-contract AdministeredActor_Tests is Test {
+contract AdministeredActorFactory_UnitTests is Test {
 
     AdministeredAgentFactory internal factory;
 
