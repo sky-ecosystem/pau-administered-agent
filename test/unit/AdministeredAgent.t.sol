@@ -9,7 +9,7 @@ import { IAdministeredAgent } from "../../src/interfaces/IAdministeredAgent.sol"
 
 import { AdministeredAgent } from "../../src/AdministeredAgent.sol";
 
-contract AdministeredActorHarness is AdministeredAgent {
+contract AdministeredAgentHarness is AdministeredAgent {
 
     using EnumerableSet for EnumerableSet.AddressSet;
 
@@ -81,7 +81,7 @@ contract AdministeredActorHarness is AdministeredAgent {
 
 }
 
-contract AdministeredActor_UnitTests is Test {
+contract AdministeredAgent_UnitTests is Test {
 
     address internal actor        = makeAddr("actor");
     address internal admin        = makeAddr("admin");
@@ -91,11 +91,11 @@ contract AdministeredActor_UnitTests is Test {
     address internal revoker      = makeAddr("revoker");
     address internal unauthorized = makeAddr("unauthorized");
 
-    AdministeredActorHarness internal administeredActor;
+    AdministeredAgentHarness internal administeredAgent;
 
     function setUp() external {
         vm.prank(deployer);
-        administeredActor = new AdministeredActorHarness(admin);
+        administeredAgent = new AdministeredAgentHarness(admin);
     }
 
     /**********************************************************************************************/
@@ -112,11 +112,11 @@ contract AdministeredActor_UnitTests is Test {
         emit IAdministeredAgent.AdminAdded(admin, deployer);
 
         vm.prank(deployer);
-        AdministeredActorHarness administeredActor_ = new AdministeredActorHarness(admin);
+        AdministeredAgentHarness administeredAgent_ = new AdministeredAgentHarness(admin);
 
-        assertEq(administeredActor_.adminCount(),     1);
-        assertEq(administeredActor_.__isAdmin(admin), true);
-        assertEq(administeredActor_.__getAdmin(0),    admin);
+        assertEq(administeredAgent_.adminCount(),     1);
+        assertEq(administeredAgent_.__isAdmin(admin), true);
+        assertEq(administeredAgent_.__getAdmin(0),    admin);
     }
 
     /**********************************************************************************************/
@@ -127,35 +127,35 @@ contract AdministeredActor_UnitTests is Test {
         vm.expectRevert(IAdministeredAgent.NotAdmin.selector);
 
         vm.prank(unauthorized);
-        administeredActor.addAdmin(otherAdmin);
+        administeredAgent.addAdmin(otherAdmin);
     }
 
     function test_addAdmin_zeroAccount() external {
         vm.expectRevert(IAdministeredAgent.ZeroAccount.selector);
 
         vm.prank(admin);
-        administeredActor.addAdmin(address(0));
+        administeredAgent.addAdmin(address(0));
     }
 
     function test_addAdmin_accountAlreadyAdmin() external {
         vm.expectRevert(IAdministeredAgent.AccountAlreadyAdmin.selector);
 
         vm.prank(admin);
-        administeredActor.addAdmin(admin);
+        administeredAgent.addAdmin(admin);
     }
 
     function test_addAdmin() external {
-        assertEq(administeredActor.adminCount(),          1);
-        assertEq(administeredActor.__isAdmin(otherAdmin), false);
+        assertEq(administeredAgent.adminCount(),          1);
+        assertEq(administeredAgent.__isAdmin(otherAdmin), false);
 
-        vm.expectEmit(address(administeredActor));
+        vm.expectEmit(address(administeredAgent));
         emit IAdministeredAgent.AdminAdded(otherAdmin, admin);
 
         vm.prank(admin);
-        administeredActor.addAdmin(otherAdmin);
+        administeredAgent.addAdmin(otherAdmin);
 
-        assertEq(administeredActor.adminCount(),          2);
-        assertEq(administeredActor.__isAdmin(otherAdmin), true);
+        assertEq(administeredAgent.adminCount(),          2);
+        assertEq(administeredAgent.__isAdmin(otherAdmin), true);
     }
 
     /**********************************************************************************************/
@@ -166,37 +166,37 @@ contract AdministeredActor_UnitTests is Test {
         vm.expectRevert(IAdministeredAgent.NotAdmin.selector);
 
         vm.prank(unauthorized);
-        administeredActor.removeAdmin(admin);
+        administeredAgent.removeAdmin(admin);
     }
 
     function test_removeAdmin_accountNotAdmin() external {
         vm.expectRevert(IAdministeredAgent.AccountNotAdmin.selector);
 
         vm.prank(admin);
-        administeredActor.removeAdmin(unauthorized);
+        administeredAgent.removeAdmin(unauthorized);
     }
 
     function test_removeAdmin_noAdminsRemaining() external {
         vm.expectRevert(IAdministeredAgent.NoAdminsRemaining.selector);
 
         vm.prank(admin);
-        administeredActor.removeAdmin(admin);
+        administeredAgent.removeAdmin(admin);
     }
 
     function test_removeAdmin() external {
-        administeredActor.__addAdmin(otherAdmin);
+        administeredAgent.__addAdmin(otherAdmin);
 
-        assertEq(administeredActor.adminCount(),          2);
-        assertEq(administeredActor.__isAdmin(otherAdmin), true);
+        assertEq(administeredAgent.adminCount(),          2);
+        assertEq(administeredAgent.__isAdmin(otherAdmin), true);
 
-        vm.expectEmit(address(administeredActor));
+        vm.expectEmit(address(administeredAgent));
         emit IAdministeredAgent.AdminRemoved(otherAdmin, admin);
 
         vm.prank(admin);
-        administeredActor.removeAdmin(otherAdmin);
+        administeredAgent.removeAdmin(otherAdmin);
 
-        assertEq(administeredActor.adminCount(),          1);
-        assertEq(administeredActor.__isAdmin(otherAdmin), false);
+        assertEq(administeredAgent.adminCount(),          1);
+        assertEq(administeredAgent.__isAdmin(otherAdmin), false);
     }
 
     /**********************************************************************************************/
@@ -207,37 +207,37 @@ contract AdministeredActor_UnitTests is Test {
         vm.expectRevert(IAdministeredAgent.NotAdmin.selector);
 
         vm.prank(unauthorized);
-        administeredActor.addGrantor(grantor);
+        administeredAgent.addGrantor(grantor);
     }
 
     function test_addGrantor_zeroAccount() external {
         vm.expectRevert(IAdministeredAgent.ZeroAccount.selector);
 
         vm.prank(admin);
-        administeredActor.addGrantor(address(0));
+        administeredAgent.addGrantor(address(0));
     }
 
     function test_addGrantor_accountAlreadyGrantor() external {
-        administeredActor.__addGrantor(grantor);
+        administeredAgent.__addGrantor(grantor);
 
         vm.expectRevert(IAdministeredAgent.AccountAlreadyGrantor.selector);
 
         vm.prank(admin);
-        administeredActor.addGrantor(grantor);
+        administeredAgent.addGrantor(grantor);
     }
 
     function test_addGrantor() external {
-        assertEq(administeredActor.grantorCount(),       0);
-        assertEq(administeredActor.__isGrantor(grantor), false);
+        assertEq(administeredAgent.grantorCount(),       0);
+        assertEq(administeredAgent.__isGrantor(grantor), false);
 
-        vm.expectEmit(address(administeredActor));
+        vm.expectEmit(address(administeredAgent));
         emit IAdministeredAgent.GrantorAdded(grantor, admin);
 
         vm.prank(admin);
-        administeredActor.addGrantor(grantor);
+        administeredAgent.addGrantor(grantor);
 
-        assertEq(administeredActor.grantorCount(),       1);
-        assertEq(administeredActor.__isGrantor(grantor), true);
+        assertEq(administeredAgent.grantorCount(),       1);
+        assertEq(administeredAgent.__isGrantor(grantor), true);
     }
 
     /**********************************************************************************************/
@@ -248,30 +248,30 @@ contract AdministeredActor_UnitTests is Test {
         vm.expectRevert(IAdministeredAgent.NotAdmin.selector);
 
         vm.prank(unauthorized);
-        administeredActor.removeGrantor(grantor);
+        administeredAgent.removeGrantor(grantor);
     }
 
     function test_removeGrantor_accountNotGrantor() external {
         vm.expectRevert(IAdministeredAgent.AccountNotGrantor.selector);
 
         vm.prank(admin);
-        administeredActor.removeGrantor(grantor);
+        administeredAgent.removeGrantor(grantor);
     }
 
     function test_removeGrantor() external {
-        administeredActor.__addGrantor(grantor);
+        administeredAgent.__addGrantor(grantor);
 
-        assertEq(administeredActor.grantorCount(),       1);
-        assertEq(administeredActor.__isGrantor(grantor), true);
+        assertEq(administeredAgent.grantorCount(),       1);
+        assertEq(administeredAgent.__isGrantor(grantor), true);
 
-        vm.expectEmit(address(administeredActor));
+        vm.expectEmit(address(administeredAgent));
         emit IAdministeredAgent.GrantorRemoved(grantor, admin);
 
         vm.prank(admin);
-        administeredActor.removeGrantor(grantor);
+        administeredAgent.removeGrantor(grantor);
 
-        assertEq(administeredActor.grantorCount(),       0);
-        assertEq(administeredActor.__isGrantor(grantor), false);
+        assertEq(administeredAgent.grantorCount(),       0);
+        assertEq(administeredAgent.__isGrantor(grantor), false);
     }
 
     /**********************************************************************************************/
@@ -282,37 +282,37 @@ contract AdministeredActor_UnitTests is Test {
         vm.expectRevert(IAdministeredAgent.NotAdmin.selector);
 
         vm.prank(unauthorized);
-        administeredActor.addRevoker(revoker);
+        administeredAgent.addRevoker(revoker);
     }
 
     function test_addRevoker_zeroAccount() external {
         vm.expectRevert(IAdministeredAgent.ZeroAccount.selector);
 
         vm.prank(admin);
-        administeredActor.addRevoker(address(0));
+        administeredAgent.addRevoker(address(0));
     }
 
     function test_addRevoker_accountAlreadyRevoker() external {
-        administeredActor.__addRevoker(revoker);
+        administeredAgent.__addRevoker(revoker);
 
         vm.expectRevert(IAdministeredAgent.AccountAlreadyRevoker.selector);
 
         vm.prank(admin);
-        administeredActor.addRevoker(revoker);
+        administeredAgent.addRevoker(revoker);
     }
 
     function test_addRevoker() external {
-        assertEq(administeredActor.revokerCount(),       0);
-        assertEq(administeredActor.__isRevoker(revoker), false);
+        assertEq(administeredAgent.revokerCount(),       0);
+        assertEq(administeredAgent.__isRevoker(revoker), false);
 
-        vm.expectEmit(address(administeredActor));
+        vm.expectEmit(address(administeredAgent));
         emit IAdministeredAgent.RevokerAdded(revoker, admin);
 
         vm.prank(admin);
-        administeredActor.addRevoker(revoker);
+        administeredAgent.addRevoker(revoker);
 
-        assertEq(administeredActor.revokerCount(),       1);
-        assertEq(administeredActor.__isRevoker(revoker), true);
+        assertEq(administeredAgent.revokerCount(),       1);
+        assertEq(administeredAgent.__isRevoker(revoker), true);
     }
 
     /**********************************************************************************************/
@@ -323,30 +323,30 @@ contract AdministeredActor_UnitTests is Test {
         vm.expectRevert(IAdministeredAgent.NotAdmin.selector);
 
         vm.prank(unauthorized);
-        administeredActor.removeRevoker(revoker);
+        administeredAgent.removeRevoker(revoker);
     }
 
     function test_removeRevoker_accountNotRevoker() external {
         vm.expectRevert(IAdministeredAgent.AccountNotRevoker.selector);
 
         vm.prank(admin);
-        administeredActor.removeRevoker(revoker);
+        administeredAgent.removeRevoker(revoker);
     }
 
     function test_removeRevoker() external {
-        administeredActor.__addRevoker(revoker);
+        administeredAgent.__addRevoker(revoker);
 
-        assertEq(administeredActor.revokerCount(),       1);
-        assertEq(administeredActor.__isRevoker(revoker), true);
+        assertEq(administeredAgent.revokerCount(),       1);
+        assertEq(administeredAgent.__isRevoker(revoker), true);
 
-        vm.expectEmit(address(administeredActor));
+        vm.expectEmit(address(administeredAgent));
         emit IAdministeredAgent.RevokerRemoved(revoker, admin);
 
         vm.prank(admin);
-        administeredActor.removeRevoker(revoker);
+        administeredAgent.removeRevoker(revoker);
 
-        assertEq(administeredActor.revokerCount(),       0);
-        assertEq(administeredActor.__isRevoker(revoker), false);
+        assertEq(administeredAgent.revokerCount(),       0);
+        assertEq(administeredAgent.__isRevoker(revoker), false);
     }
 
     /**********************************************************************************************/
@@ -357,53 +357,53 @@ contract AdministeredActor_UnitTests is Test {
         vm.expectRevert(IAdministeredAgent.NotGrantor.selector);
 
         vm.prank(unauthorized);
-        administeredActor.addActor(actor);
+        administeredAgent.addActor(actor);
     }
 
     function test_addActor_zeroAccount() external {
         vm.expectRevert(IAdministeredAgent.ZeroAccount.selector);
 
         vm.prank(admin);
-        administeredActor.addActor(address(0));
+        administeredAgent.addActor(address(0));
     }
 
     function test_addActor_accountAlreadyActor() external {
-        administeredActor.__addActor(actor);
+        administeredAgent.__addActor(actor);
 
         vm.expectRevert(IAdministeredAgent.AccountAlreadyActor.selector);
 
         vm.prank(admin);
-        administeredActor.addActor(actor);
+        administeredAgent.addActor(actor);
     }
 
     function test_addActor_asAdmin() external {
-        assertEq(administeredActor.actorCount(),     0);
-        assertEq(administeredActor.__isActor(actor), false);
+        assertEq(administeredAgent.actorCount(),     0);
+        assertEq(administeredAgent.__isActor(actor), false);
 
-        vm.expectEmit(address(administeredActor));
+        vm.expectEmit(address(administeredAgent));
         emit IAdministeredAgent.ActorAdded(actor, admin);
 
         vm.prank(admin);
-        administeredActor.addActor(actor);
+        administeredAgent.addActor(actor);
 
-        assertEq(administeredActor.actorCount(),     1);
-        assertEq(administeredActor.__isActor(actor), true);
+        assertEq(administeredAgent.actorCount(),     1);
+        assertEq(administeredAgent.__isActor(actor), true);
     }
 
     function test_addActor_asGrantor() external {
-        administeredActor.__addGrantor(grantor);
+        administeredAgent.__addGrantor(grantor);
 
-        assertEq(administeredActor.actorCount(),     0);
-        assertEq(administeredActor.__isActor(actor), false);
+        assertEq(administeredAgent.actorCount(),     0);
+        assertEq(administeredAgent.__isActor(actor), false);
 
-        vm.expectEmit(address(administeredActor));
+        vm.expectEmit(address(administeredAgent));
         emit IAdministeredAgent.ActorAdded(actor, grantor);
 
         vm.prank(grantor);
-        administeredActor.addActor(actor);
+        administeredAgent.addActor(actor);
 
-        assertEq(administeredActor.actorCount(),     1);
-        assertEq(administeredActor.__isActor(actor), true);
+        assertEq(administeredAgent.actorCount(),     1);
+        assertEq(administeredAgent.__isActor(actor), true);
     }
 
     /**********************************************************************************************/
@@ -414,47 +414,47 @@ contract AdministeredActor_UnitTests is Test {
         vm.expectRevert(IAdministeredAgent.NotRevoker.selector);
 
         vm.prank(unauthorized);
-        administeredActor.removeActor(actor);
+        administeredAgent.removeActor(actor);
     }
 
     function test_removeActor_accountNotActor() external {
         vm.expectRevert(IAdministeredAgent.AccountNotActor.selector);
 
         vm.prank(admin);
-        administeredActor.removeActor(actor);
+        administeredAgent.removeActor(actor);
     }
 
     function test_removeActor_asAdmin() external {
-        administeredActor.__addActor(actor);
+        administeredAgent.__addActor(actor);
 
-        assertEq(administeredActor.actorCount(),     1);
-        assertEq(administeredActor.__isActor(actor), true);
+        assertEq(administeredAgent.actorCount(),     1);
+        assertEq(administeredAgent.__isActor(actor), true);
 
-        vm.expectEmit(address(administeredActor));
+        vm.expectEmit(address(administeredAgent));
         emit IAdministeredAgent.ActorRemoved(actor, admin);
 
         vm.prank(admin);
-        administeredActor.removeActor(actor);
+        administeredAgent.removeActor(actor);
 
-        assertEq(administeredActor.actorCount(),     0);
-        assertEq(administeredActor.__isActor(actor), false);
+        assertEq(administeredAgent.actorCount(),     0);
+        assertEq(administeredAgent.__isActor(actor), false);
     }
 
     function test_removeActor_asRevoker() external {
-        administeredActor.__addActor(actor);
-        administeredActor.__addRevoker(revoker);
+        administeredAgent.__addActor(actor);
+        administeredAgent.__addRevoker(revoker);
 
-        assertEq(administeredActor.actorCount(),     1);
-        assertEq(administeredActor.__isActor(actor), true);
+        assertEq(administeredAgent.actorCount(),     1);
+        assertEq(administeredAgent.__isActor(actor), true);
 
-        vm.expectEmit(address(administeredActor));
+        vm.expectEmit(address(administeredAgent));
         emit IAdministeredAgent.ActorRemoved(actor, revoker);
 
         vm.prank(revoker);
-        administeredActor.removeActor(actor);
+        administeredAgent.removeActor(actor);
 
-        assertEq(administeredActor.actorCount(),     0);
-        assertEq(administeredActor.__isActor(actor), false);
+        assertEq(administeredAgent.actorCount(),     0);
+        assertEq(administeredAgent.__isActor(actor), false);
     }
 
     /**********************************************************************************************/
@@ -465,11 +465,11 @@ contract AdministeredActor_UnitTests is Test {
         vm.expectRevert(IAdministeredAgent.NotActor.selector);
 
         vm.prank(unauthorized);
-        administeredActor.call(makeAddr("target"), hex"12345678");
+        administeredAgent.call(makeAddr("target"), hex"12345678");
     }
 
     function test_call_reverts() external {
-        administeredActor.__addActor(actor);
+        administeredAgent.__addActor(actor);
 
         address target = makeAddr("target");
 
@@ -480,11 +480,11 @@ contract AdministeredActor_UnitTests is Test {
         vm.expectRevert(bytes(hex"87654321"));
 
         vm.prank(actor);
-        administeredActor.call(address(target), data);
+        administeredAgent.call(address(target), data);
     }
 
     function test_call_withNoValue() external {
-        administeredActor.__addActor(actor);
+        administeredAgent.__addActor(actor);
 
         address target = makeAddr("target");
 
@@ -494,13 +494,13 @@ contract AdministeredActor_UnitTests is Test {
         vm.expectCall(target, data);
 
         vm.prank(actor);
-        bytes memory result = administeredActor.call(address(target), data);
+        bytes memory result = administeredAgent.call(address(target), data);
 
         assertEq(keccak256(result), keccak256(hex"87654321"));
     }
 
     function test_call_withValue() external {
-        administeredActor.__addActor(actor);
+        administeredAgent.__addActor(actor);
 
         address target = makeAddr("target");
 
@@ -512,7 +512,7 @@ contract AdministeredActor_UnitTests is Test {
         vm.expectCall(target, 0.5 ether, data);
 
         vm.prank(actor);
-        bytes memory result = administeredActor.call{ value: 0.5 ether }(address(target), data);
+        bytes memory result = administeredAgent.call{ value: 0.5 ether }(address(target), data);
 
         assertEq(keccak256(result), keccak256(hex"87654321"));
     }
@@ -525,30 +525,30 @@ contract AdministeredActor_UnitTests is Test {
         vm.expectRevert(IAdministeredAgent.NotActor.selector);
 
         vm.prank(unauthorized);
-        administeredActor.batchCall(new address[](0), new bytes[](0), new uint256[](0));
+        administeredAgent.batchCall(new address[](0), new bytes[](0), new uint256[](0));
     }
 
     function test_batchCall_mismatchedArrayLengths() external {
-        administeredActor.__addActor(actor);
+        administeredAgent.__addActor(actor);
 
         vm.expectRevert(IAdministeredAgent.MismatchedArrayLengths.selector);
 
         vm.prank(actor);
-        administeredActor.batchCall(new address[](2), new bytes[](1), new uint256[](1));
+        administeredAgent.batchCall(new address[](2), new bytes[](1), new uint256[](1));
 
         vm.expectRevert(IAdministeredAgent.MismatchedArrayLengths.selector);
 
         vm.prank(actor);
-        administeredActor.batchCall(new address[](1), new bytes[](2), new uint256[](1));
+        administeredAgent.batchCall(new address[](1), new bytes[](2), new uint256[](1));
 
         vm.expectRevert(IAdministeredAgent.MismatchedArrayLengths.selector);
 
         vm.prank(actor);
-        administeredActor.batchCall(new address[](1), new bytes[](1), new uint256[](2));
+        administeredAgent.batchCall(new address[](1), new bytes[](1), new uint256[](2));
     }
 
     function test_batchCall_reverts() external {
-        administeredActor.__addActor(actor);
+        administeredAgent.__addActor(actor);
 
         address[] memory targets = new address[](3);
         targets[0] = makeAddr("target1");
@@ -570,7 +570,7 @@ contract AdministeredActor_UnitTests is Test {
         vm.expectRevert(bytes(hex"22222222"));
 
         vm.prank(actor);
-        administeredActor.batchCall(targets, data, values);
+        administeredAgent.batchCall(targets, data, values);
 
         vm.mockCall(targets[0],       data[0], "");
         vm.mockCallRevert(targets[1], data[1], hex"33333333");
@@ -578,7 +578,7 @@ contract AdministeredActor_UnitTests is Test {
         vm.expectRevert(bytes(hex"33333333"));
 
         vm.prank(actor);
-        administeredActor.batchCall(targets, data, values);
+        administeredAgent.batchCall(targets, data, values);
 
         vm.mockCall(targets[0],       data[0], "");
         vm.mockCall(targets[1],       data[1], "");
@@ -587,11 +587,11 @@ contract AdministeredActor_UnitTests is Test {
         vm.expectRevert(bytes(hex"44444444"));
 
         vm.prank(actor);
-        administeredActor.batchCall(targets, data, values);
+        administeredAgent.batchCall(targets, data, values);
     }
 
     function test_batchCall_withNoValue() external {
-        administeredActor.__addActor(actor);
+        administeredAgent.__addActor(actor);
 
         address[] memory targets = new address[](3);
         targets[0] = makeAddr("target1");
@@ -616,7 +616,7 @@ contract AdministeredActor_UnitTests is Test {
         vm.expectCall(targets[2], data[2]);
 
         vm.prank(actor);
-        bytes[] memory results = administeredActor.batchCall(targets, data, values);
+        bytes[] memory results = administeredAgent.batchCall(targets, data, values);
 
         assertEq(results.length, 3);
 
@@ -626,7 +626,7 @@ contract AdministeredActor_UnitTests is Test {
     }
 
     function test_batchCall_withValue() external {
-        administeredActor.__addActor(actor);
+        administeredAgent.__addActor(actor);
 
         address[] memory targets = new address[](3);
         targets[0] = makeAddr("target1");
@@ -653,7 +653,7 @@ contract AdministeredActor_UnitTests is Test {
         vm.expectCall(targets[2], 0.5 ether, data[2]);
 
         vm.prank(actor);
-        bytes[] memory results = administeredActor.batchCall{ value: 0.7 ether }(targets, data, values);
+        bytes[] memory results = administeredAgent.batchCall{ value: 0.7 ether }(targets, data, values);
 
         assertEq(results.length, 3);
 
@@ -670,20 +670,20 @@ contract AdministeredActor_UnitTests is Test {
         vm.expectRevert(IAdministeredAgent.NotActor.selector);
 
         vm.prank(unauthorized);
-        administeredActor.sendValue(makeAddr("recipient"), 1 ether);
+        administeredAgent.sendValue(makeAddr("recipient"), 1 ether);
     }
 
     function test_sendValue() external {
-        administeredActor.__addActor(actor);
+        administeredAgent.__addActor(actor);
 
         address recipient = makeAddr("recipient");
 
-        vm.deal(address(administeredActor), 1 ether);
+        vm.deal(address(administeredAgent), 1 ether);
 
         vm.prank(actor);
-        administeredActor.sendValue(recipient, 0.5 ether);
+        administeredAgent.sendValue(recipient, 0.5 ether);
 
-        assertEq(address(administeredActor).balance, 0.5 ether);
+        assertEq(address(administeredAgent).balance, 0.5 ether);
         assertEq(recipient.balance,                  0.5 ether);
     }
 
@@ -692,15 +692,15 @@ contract AdministeredActor_UnitTests is Test {
     /**********************************************************************************************/
 
     function test_adminCount() external {
-        assertEq(administeredActor.adminCount(), 1);
+        assertEq(administeredAgent.adminCount(), 1);
 
-        administeredActor.__addAdmin(otherAdmin);
+        administeredAgent.__addAdmin(otherAdmin);
 
-        assertEq(administeredActor.adminCount(), 2);
+        assertEq(administeredAgent.adminCount(), 2);
 
-        administeredActor.__removeAdmin(otherAdmin);
+        administeredAgent.__removeAdmin(otherAdmin);
 
-        assertEq(administeredActor.adminCount(), 1);
+        assertEq(administeredAgent.adminCount(), 1);
     }
 
     /**********************************************************************************************/
@@ -708,15 +708,15 @@ contract AdministeredActor_UnitTests is Test {
     /**********************************************************************************************/
 
     function test_actorCount() external {
-        assertEq(administeredActor.actorCount(), 0);
+        assertEq(administeredAgent.actorCount(), 0);
 
-        administeredActor.__addActor(actor);
+        administeredAgent.__addActor(actor);
 
-        assertEq(administeredActor.actorCount(), 1);
+        assertEq(administeredAgent.actorCount(), 1);
 
-        administeredActor.__removeActor(actor);
+        administeredAgent.__removeActor(actor);
 
-        assertEq(administeredActor.actorCount(), 0);
+        assertEq(administeredAgent.actorCount(), 0);
     }
 
     /**********************************************************************************************/
@@ -724,15 +724,15 @@ contract AdministeredActor_UnitTests is Test {
     /**********************************************************************************************/
 
     function test_grantorCount() external {
-        assertEq(administeredActor.grantorCount(), 0);
+        assertEq(administeredAgent.grantorCount(), 0);
 
-        administeredActor.__addGrantor(grantor);
+        administeredAgent.__addGrantor(grantor);
 
-        assertEq(administeredActor.grantorCount(), 1);
+        assertEq(administeredAgent.grantorCount(), 1);
 
-        administeredActor.__removeGrantor(grantor);
+        administeredAgent.__removeGrantor(grantor);
 
-        assertEq(administeredActor.grantorCount(), 0);
+        assertEq(administeredAgent.grantorCount(), 0);
     }
 
     /**********************************************************************************************/
@@ -740,15 +740,15 @@ contract AdministeredActor_UnitTests is Test {
     /**********************************************************************************************/
 
     function test_revokerCount() external {
-        assertEq(administeredActor.revokerCount(), 0);
+        assertEq(administeredAgent.revokerCount(), 0);
 
-        administeredActor.__addRevoker(revoker);
+        administeredAgent.__addRevoker(revoker);
 
-        assertEq(administeredActor.revokerCount(), 1);
+        assertEq(administeredAgent.revokerCount(), 1);
 
-        administeredActor.__removeRevoker(revoker);
+        administeredAgent.__removeRevoker(revoker);
 
-        assertEq(administeredActor.revokerCount(), 0);
+        assertEq(administeredAgent.revokerCount(), 0);
     }
 
     /**********************************************************************************************/
@@ -756,10 +756,10 @@ contract AdministeredActor_UnitTests is Test {
     /**********************************************************************************************/
 
     function test_getAdmin() external {
-        administeredActor.__addAdmin(otherAdmin);
+        administeredAgent.__addAdmin(otherAdmin);
 
-        assertEq(administeredActor.getAdmin(0), admin);
-        assertEq(administeredActor.getAdmin(1), otherAdmin);
+        assertEq(administeredAgent.getAdmin(0), admin);
+        assertEq(administeredAgent.getAdmin(1), otherAdmin);
     }
 
     /**********************************************************************************************/
@@ -769,11 +769,11 @@ contract AdministeredActor_UnitTests is Test {
     function test_getActor() external {
         address otherActor = makeAddr("otherActor");
 
-        administeredActor.__addActor(actor);
-        administeredActor.__addActor(otherActor);
+        administeredAgent.__addActor(actor);
+        administeredAgent.__addActor(otherActor);
 
-        assertEq(administeredActor.getActor(0), actor);
-        assertEq(administeredActor.getActor(1), otherActor);
+        assertEq(administeredAgent.getActor(0), actor);
+        assertEq(administeredAgent.getActor(1), otherActor);
     }
 
     /**********************************************************************************************/
@@ -783,11 +783,11 @@ contract AdministeredActor_UnitTests is Test {
     function test_getGrantor() external {
         address otherGrantor = makeAddr("otherGrantor");
 
-        administeredActor.__addGrantor(grantor);
-        administeredActor.__addGrantor(otherGrantor);
+        administeredAgent.__addGrantor(grantor);
+        administeredAgent.__addGrantor(otherGrantor);
 
-        assertEq(administeredActor.getGrantor(0), grantor);
-        assertEq(administeredActor.getGrantor(1), otherGrantor);
+        assertEq(administeredAgent.getGrantor(0), grantor);
+        assertEq(administeredAgent.getGrantor(1), otherGrantor);
     }
 
     /**********************************************************************************************/
@@ -797,11 +797,11 @@ contract AdministeredActor_UnitTests is Test {
     function test_getRevoker() external {
         address otherRevoker = makeAddr("otherRevoker");
 
-        administeredActor.__addRevoker(revoker);
-        administeredActor.__addRevoker(otherRevoker);
+        administeredAgent.__addRevoker(revoker);
+        administeredAgent.__addRevoker(otherRevoker);
 
-        assertEq(administeredActor.getRevoker(0), revoker);
-        assertEq(administeredActor.getRevoker(1), otherRevoker);
+        assertEq(administeredAgent.getRevoker(0), revoker);
+        assertEq(administeredAgent.getRevoker(1), otherRevoker);
     }
 
     /**********************************************************************************************/
@@ -809,8 +809,8 @@ contract AdministeredActor_UnitTests is Test {
     /**********************************************************************************************/
 
     function test_getIsAdmin() external view {
-        assertEq(administeredActor.getIsAdmin(admin),        true);
-        assertEq(administeredActor.getIsAdmin(unauthorized), false);
+        assertEq(administeredAgent.getIsAdmin(admin),        true);
+        assertEq(administeredAgent.getIsAdmin(unauthorized), false);
     }
 
     /**********************************************************************************************/
@@ -818,11 +818,11 @@ contract AdministeredActor_UnitTests is Test {
     /**********************************************************************************************/
 
     function test_getIsActor() external {
-        assertEq(administeredActor.getIsActor(actor), false);
+        assertEq(administeredAgent.getIsActor(actor), false);
 
-        administeredActor.__addActor(actor);
+        administeredAgent.__addActor(actor);
 
-        assertEq(administeredActor.getIsActor(actor), true);
+        assertEq(administeredAgent.getIsActor(actor), true);
     }
 
     /**********************************************************************************************/
@@ -830,11 +830,11 @@ contract AdministeredActor_UnitTests is Test {
     /**********************************************************************************************/
 
     function test_getIsGrantor() external {
-        assertEq(administeredActor.getIsGrantor(grantor), false);
+        assertEq(administeredAgent.getIsGrantor(grantor), false);
 
-        administeredActor.__addGrantor(grantor);
+        administeredAgent.__addGrantor(grantor);
 
-        assertEq(administeredActor.getIsGrantor(grantor), true);
+        assertEq(administeredAgent.getIsGrantor(grantor), true);
     }
 
     /**********************************************************************************************/
@@ -842,11 +842,11 @@ contract AdministeredActor_UnitTests is Test {
     /**********************************************************************************************/
 
     function test_getIsRevoker() external {
-        assertEq(administeredActor.getIsRevoker(revoker), false);
+        assertEq(administeredAgent.getIsRevoker(revoker), false);
 
-        administeredActor.__addRevoker(revoker);
+        administeredAgent.__addRevoker(revoker);
 
-        assertEq(administeredActor.getIsRevoker(revoker), true);
+        assertEq(administeredAgent.getIsRevoker(revoker), true);
     }
 
 }

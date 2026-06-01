@@ -124,12 +124,12 @@ contract AdministeredAgent is IAdministeredAgent {
         onlyActor
         returns (bytes[] memory results)
     {
-        results = new bytes[](targets.length);
-
         require(
             targets.length == data.length && targets.length == values.length,
             MismatchedArrayLengths()
         );
+
+        results = new bytes[](targets.length);
 
         for (uint256 i = 0; i < targets.length; ++i) {
             results[i] = Address.functionCallWithValue(targets[i], data[i], values[i]);
