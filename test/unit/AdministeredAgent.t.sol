@@ -468,6 +468,18 @@ contract AdministeredAgent_UnitTests is Test {
         administeredAgent.call(makeAddr("target"), hex"12345678");
     }
 
+    function test_call_invalidTarget() external {
+        administeredAgent.__addActor(actor);
+
+        vm.expectRevert(IAdministeredAgent.InvalidTarget.selector);
+
+        vm.prank(actor);
+        administeredAgent.call(
+            address(administeredAgent),
+            abi.encodeCall(IAdministeredAgent.addAdmin, (actor))
+        );
+    }
+
     function test_call_reverts() external {
         administeredAgent.__addActor(actor);
 
@@ -545,6 +557,29 @@ contract AdministeredAgent_UnitTests is Test {
 
         vm.prank(actor);
         administeredAgent.batchCall(new address[](1), new bytes[](1), new uint256[](2));
+    }
+
+    function test_batchCall_invalidTarget() external {
+        administeredAgent.__addActor(actor);
+
+        address[] memory targets = new address[](2);
+        targets[0] = makeAddr("target1");
+        targets[1] = address(administeredAgent);
+
+        bytes[] memory data = new bytes[](2);
+        data[0] = hex"12345678";
+        data[1] = abi.encodeCall(IAdministeredAgent.addAdmin, (actor));
+
+        uint256[] memory values = new uint256[](2);
+        values[0] = 0;
+        values[1] = 0;
+
+        vm.mockCall(targets[0], data[0], "");
+
+        vm.expectRevert(IAdministeredAgent.InvalidTarget.selector);
+
+        vm.prank(actor);
+        administeredAgent.batchCall(targets, data, values);
     }
 
     function test_batchCall_reverts() external {

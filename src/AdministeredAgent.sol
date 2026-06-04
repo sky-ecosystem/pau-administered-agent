@@ -114,6 +114,8 @@ contract AdministeredAgent is IAdministeredAgent {
         onlyActor
         returns (bytes memory result)
     {
+        require(target != address(this), InvalidTarget());
+
         result = Address.functionCallWithValue(target, data, msg.value);
     }
 
@@ -132,6 +134,8 @@ contract AdministeredAgent is IAdministeredAgent {
         results = new bytes[](targets.length);
 
         for (uint256 i = 0; i < targets.length; ++i) {
+            require(targets[i] != address(this), InvalidTarget());
+
             results[i] = Address.functionCallWithValue(targets[i], data[i], values[i]);
         }
     }
