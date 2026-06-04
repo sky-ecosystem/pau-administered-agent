@@ -96,6 +96,9 @@ interface IAdministeredAgent {
     /// @notice Thrown when the account argument is not a revoker.
     error AccountNotRevoker();
 
+    /// @notice Thrown when the call target is the agent itself.
+    error InvalidTarget();
+
     /// @notice Thrown when the array lengths are mismatched.
     error MismatchedArrayLengths();
 
