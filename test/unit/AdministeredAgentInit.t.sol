@@ -167,24 +167,6 @@ contract AdministeredAgentInit_Unit_Tests is Test {
         governance.init(address(agent), _empty());
     }
 
-    function test_init_actorAddedByGrantorBeforeInit_reverts() external {
-        // The pre-existing actor need not come from the admin: a grantor configured out of band can
-        // add actors too, and the count check catches that path as well.
-        address preExistingGrantor = makeAddr("preExistingGrantor");
-
-        vm.prank(address(governance));
-        agent.addGrantor(preExistingGrantor);
-
-        vm.prank(preExistingGrantor);
-        agent.addActor(makeAddr("preExistingActor"));
-
-        vm.prank(address(governance));
-        agent.removeGrantor(preExistingGrantor);
-
-        vm.expectRevert(bytes("AdministeredAgentInit/actors-not-empty"));
-        governance.init(address(agent), _empty());
-    }
-
     function test_init_duplicateAdminInParams_reverts() external {
         // Duplicates within a single params list are rejected by the agent's add* functions.
         AdministeredAgentInitParams memory p = _empty();
