@@ -75,22 +75,22 @@ contract AdministeredAgentInit_Unit_Tests is Test {
 
         governance.init(address(agent), p);
 
-        assertTrue(agent.getIsAdmin(admin));
-        assertTrue(agent.getIsActor(actor));
-        assertTrue(agent.getIsGrantor(grantor));
-        assertTrue(agent.getIsRevoker(revoker));
+        assertEq(agent.getIsAdmin(admin),     true);
+        assertEq(agent.getIsActor(actor),     true);
+        assertEq(agent.getIsGrantor(grantor), true);
+        assertEq(agent.getIsRevoker(revoker), true);
 
         // The governance proxy (constructor admin) remains admin.
-        assertTrue(agent.getIsAdmin(address(governance)));
+        assertEq(agent.getIsAdmin(address(governance)), true);
     }
 
     function test_init_emptyParams_leavesOnlyConstructorAdmin() external {
         governance.init(address(agent), _empty());
 
-        assertTrue(agent.getIsAdmin(address(governance)));
-        assertFalse(agent.getIsActor(actor));
-        assertFalse(agent.getIsGrantor(grantor));
-        assertFalse(agent.getIsRevoker(revoker));
+        assertEq(agent.getIsAdmin(address(governance)), true);
+        assertEq(agent.getIsActor(actor),               false);
+        assertEq(agent.getIsGrantor(grantor),           false);
+        assertEq(agent.getIsRevoker(revoker),           false);
     }
 
     function test_init_zeroAgent_reverts() external {
