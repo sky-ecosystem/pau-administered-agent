@@ -46,6 +46,9 @@ contract AdministeredAgent_IntegrationTests is Test {
         assertEq(address(administeredAgent).balance, 0);
         assertEq(target.balance,                     0);
 
+        vm.expectEmit(address(administeredAgent));
+        emit IAdministeredAgent.ExecutionSucceeded(actor);
+
         vm.prank(actor);
         bytes memory result = administeredAgent.call{ value: 0.5 ether }(target, abi.encodeWithSelector(MockTarget.foo.selector, 1));
 
@@ -86,6 +89,9 @@ contract AdministeredAgent_IntegrationTests is Test {
         assertEq(target1.balance,                    0);
         assertEq(target2.balance,                    0);
 
+        vm.expectEmit(address(administeredAgent));
+        emit IAdministeredAgent.ExecutionSucceeded(actor);
+
         vm.prank(actor);
         bytes[] memory results = administeredAgent.batchCall{ value: 0.9 ether }(targets, data, values);
 
@@ -112,6 +118,9 @@ contract AdministeredAgent_IntegrationTests is Test {
 
         assertEq(address(administeredAgent).balance, 1 ether);
         assertEq(target.balance,                     0);
+
+        vm.expectEmit(address(administeredAgent));
+        emit IAdministeredAgent.ExecutionSucceeded(actor);
 
         vm.prank(actor);
         administeredAgent.sendValue(target, 0.4 ether);

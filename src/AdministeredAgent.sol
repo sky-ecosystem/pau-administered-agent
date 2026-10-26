@@ -117,6 +117,8 @@ contract AdministeredAgent is IAdministeredAgent {
         require(target != address(this), InvalidTarget());
 
         result = Address.functionCallWithValue(target, data, msg.value);
+
+        emit ExecutionSucceeded(msg.sender);
     }
 
     function batchCall(address[] memory targets, bytes[] memory data, uint256[] memory values)
@@ -138,10 +140,14 @@ contract AdministeredAgent is IAdministeredAgent {
 
             results[i] = Address.functionCallWithValue(targets[i], data[i], values[i]);
         }
+
+        emit ExecutionSucceeded(msg.sender);
     }
 
     function sendValue(address target, uint256 value) external payable override onlyActor {
         Address.sendValue(payable(target), value);
+
+        emit ExecutionSucceeded(msg.sender);
     }
 
     /**********************************************************************************************/

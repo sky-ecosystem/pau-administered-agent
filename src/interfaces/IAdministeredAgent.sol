@@ -41,6 +41,12 @@ interface IAdministeredAgent {
     event AdminRemoved(address indexed account, address indexed caller);
 
     /**
+     * @notice Emitted when a call, batch call, or value transfer is executed successfully.
+     * @param  caller The caller that executed it.
+     */
+    event ExecutionSucceeded(address indexed caller);
+
+    /**
      * @notice Emitted when a grantor is added.
      * @param  account The account that was added as a grantor.
      * @param  caller  The caller that added the grantor.

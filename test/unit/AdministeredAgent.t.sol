@@ -505,6 +505,9 @@ contract AdministeredAgent_UnitTests is Test {
         vm.mockCall(target,   data, hex"87654321");
         vm.expectCall(target, data);
 
+        vm.expectEmit(address(administeredAgent));
+        emit IAdministeredAgent.ExecutionSucceeded(actor);
+
         vm.prank(actor);
         bytes memory result = administeredAgent.call(address(target), data);
 
@@ -522,6 +525,9 @@ contract AdministeredAgent_UnitTests is Test {
 
         vm.mockCall(target,   0.5 ether, data, hex"87654321");
         vm.expectCall(target, 0.5 ether, data);
+
+        vm.expectEmit(address(administeredAgent));
+        emit IAdministeredAgent.ExecutionSucceeded(actor);
 
         vm.prank(actor);
         bytes memory result = administeredAgent.call{ value: 0.5 ether }(address(target), data);
@@ -650,6 +656,9 @@ contract AdministeredAgent_UnitTests is Test {
         vm.mockCall(targets[2],   data[2], hex"44444444");
         vm.expectCall(targets[2], data[2]);
 
+        vm.expectEmit(address(administeredAgent));
+        emit IAdministeredAgent.ExecutionSucceeded(actor);
+
         vm.prank(actor);
         bytes[] memory results = administeredAgent.batchCall(targets, data, values);
 
@@ -687,6 +696,9 @@ contract AdministeredAgent_UnitTests is Test {
         vm.mockCall(targets[2],   0.5 ether, data[2], hex"44444444");
         vm.expectCall(targets[2], 0.5 ether, data[2]);
 
+        vm.expectEmit(address(administeredAgent));
+        emit IAdministeredAgent.ExecutionSucceeded(actor);
+
         vm.prank(actor);
         bytes[] memory results = administeredAgent.batchCall{ value: 0.7 ether }(targets, data, values);
 
@@ -714,6 +726,9 @@ contract AdministeredAgent_UnitTests is Test {
         address recipient = makeAddr("recipient");
 
         vm.deal(address(administeredAgent), 1 ether);
+
+        vm.expectEmit(address(administeredAgent));
+        emit IAdministeredAgent.ExecutionSucceeded(actor);
 
         vm.prank(actor);
         administeredAgent.sendValue(recipient, 0.5 ether);
