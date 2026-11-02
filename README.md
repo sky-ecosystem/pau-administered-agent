@@ -35,6 +35,18 @@ admin and emits `AdministeredAgentDeployed` for discovery/integration.
 forge test
 ```
 
+## Audits
+
+Audit reports are hosted on the auditors' public portfolio pages:
+
+| Auditor | Report | Version | Date |
+| --- | --- | --- | --- |
+| ChainSecurity | [Sky PAU Administered Agent](https://www.chainsecurity.com/security-audit/pau-administered-agent/) | v1.0.0 | 2026-11-02 |
+| Cantina | [Sky: Pau Administered Agent](https://cantina.xyz/portfolio/5ae21f97-587d-4c1e-9c31-969ef546c996) | - | 2026-10-07 |
+| Cantina | [Sky: PAU Administered Actor](https://cantina.xyz/portfolio/dca1b43f-27f2-460b-85c4-2069a09424e6) | v1.0.0 | 2026-06-02 |
+
+ChainSecurity reports are cumulative: each portfolio page hosts the latest version of the report, which covers all previously reviewed versions.
+
 ---
 
 <p align="center">
