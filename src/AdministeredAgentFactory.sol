@@ -7,9 +7,12 @@ import { AdministeredAgent } from "./AdministeredAgent.sol";
 
 contract AdministeredAgentFactory is IAdministeredAgentFactory {
 
+    mapping(address => bool) public isInstance;
     function deploy(address admin) external returns (address administeredAgent) {
-        administeredAgent = address(new AdministeredAgent(admin));
+        administeredAgent
+            = address(new AdministeredAgent{ salt: keccak256(abi.encode(msg.sender)) }(admin));
         emit AdministeredAgentDeployed(administeredAgent);
+        isInstance[administeredAgent] = true;
     }
 
 }

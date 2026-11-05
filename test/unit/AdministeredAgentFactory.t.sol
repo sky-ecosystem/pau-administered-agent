@@ -1,3 +1,4 @@
+
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity ^0.8.34;
 
@@ -6,6 +7,7 @@ import { Test } from "../../lib/forge-std/src/Test.sol";
 import { IAdministeredAgent }        from "../../src/interfaces/IAdministeredAgent.sol";
 import { IAdministeredAgentFactory } from "../../src/interfaces/IAdministeredAgentFactory.sol";
 
+import { AdministeredAgent }        from "../../src/AdministeredAgent.sol";
 import { AdministeredAgentFactory } from "../../src/AdministeredAgentFactory.sol";
 
 contract AdministeredAgentFactory_UnitTests is Test {
@@ -21,12 +23,27 @@ contract AdministeredAgentFactory_UnitTests is Test {
     /**********************************************************************************************/
 
     function test_deploy() external {
-        address admin = makeAddr("admin");
-        uint256 nonce = vm.getNonce(address(factory));
+        address admin    = makeAddr("admin");
+        address deployer = address(this);
+
+        bytes32 salt = keccak256(abi.encode(deployer));
+
+        bytes32 code = keccak256(abi.encodePacked(
+            type(AdministeredAgent).creationCode,
+            abi.encode(admin)
+        ));
+
+        address expectedAddress = vm.computeCreate2Address(salt, code, address(factory));
+
+        assertEq(factory.isInstance(expectedAddress), false);
 
         vm.expectEmit(address(factory));
-        emit IAdministeredAgentFactory.AdministeredAgentDeployed(vm.computeCreateAddress(address(factory), nonce));
+        emit IAdministeredAgentFactory.AdministeredAgentDeployed(expectedAddress);
 
-        assertEq(factory.deploy(admin), vm.computeCreateAddress(address(factory), nonce));
+        address deployedAddress = factory.deploy(admin);
+
+        assertEq(deployedAddress,                     expectedAddress);
+        assertEq(factory.isInstance(expectedAddress), true);
     }
+
 }
