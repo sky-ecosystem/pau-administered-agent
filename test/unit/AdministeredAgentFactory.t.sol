@@ -6,6 +6,7 @@ import { Test } from "../../lib/forge-std/src/Test.sol";
 import { IAdministeredAgent }        from "../../src/interfaces/IAdministeredAgent.sol";
 import { IAdministeredAgentFactory } from "../../src/interfaces/IAdministeredAgentFactory.sol";
 
+import { AdministeredAgent }        from "../../src/AdministeredAgent.sol";
 import { AdministeredAgentFactory } from "../../src/AdministeredAgentFactory.sol";
 
 contract AdministeredAgentFactory_UnitTests is Test {
@@ -21,12 +22,29 @@ contract AdministeredAgentFactory_UnitTests is Test {
     /**********************************************************************************************/
 
     function test_deploy() external {
-        address admin = makeAddr("admin");
-        uint256 nonce = vm.getNonce(address(factory));
+        address admin    = makeAddr("admin");
+        address deployer = makeAddr("deployer");
+
+        bytes32 salt        = keccak256("salt");
+        bytes32 create2Salt = keccak256(abi.encode(deployer, salt));
+
+        bytes32 creationCode = keccak256(abi.encodePacked(
+            type(AdministeredAgent).creationCode,
+            abi.encode(admin)
+        ));
+
+        address expectedAddress = vm.computeCreate2Address(create2Salt, creationCode, address(factory));
+
+        assertEq(factory.isInstance(expectedAddress), false);
 
         vm.expectEmit(address(factory));
-        emit IAdministeredAgentFactory.AdministeredAgentDeployed(vm.computeCreateAddress(address(factory), nonce));
+        emit IAdministeredAgentFactory.AdministeredAgentDeployed(expectedAddress);
 
-        assertEq(factory.deploy(admin), vm.computeCreateAddress(address(factory), nonce));
+        vm.prank(deployer);
+        address deployedAddress = factory.deploy(admin, salt);
+
+        assertEq(deployedAddress,                     expectedAddress);
+        assertEq(factory.isInstance(expectedAddress), true);
     }
+
 }
