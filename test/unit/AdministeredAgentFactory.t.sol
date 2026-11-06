@@ -1,4 +1,3 @@
-
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity ^0.8.34;
 
@@ -24,23 +23,25 @@ contract AdministeredAgentFactory_UnitTests is Test {
 
     function test_deploy() external {
         address admin    = makeAddr("admin");
-        address deployer = address(this);
+        address deployer = makeAddr("deployer");
 
-        bytes32 salt = keccak256(abi.encode(deployer));
+        bytes32 salt        = keccak256("salt");
+        bytes32 create2Salt = keccak256(abi.encode(deployer, salt));
 
-        bytes32 code = keccak256(abi.encodePacked(
+        bytes32 creationCode = keccak256(abi.encodePacked(
             type(AdministeredAgent).creationCode,
             abi.encode(admin)
         ));
 
-        address expectedAddress = vm.computeCreate2Address(salt, code, address(factory));
+        address expectedAddress = vm.computeCreate2Address(create2Salt, creationCode, address(factory));
 
         assertEq(factory.isInstance(expectedAddress), false);
 
         vm.expectEmit(address(factory));
         emit IAdministeredAgentFactory.AdministeredAgentDeployed(expectedAddress);
 
-        address deployedAddress = factory.deploy(admin);
+        vm.prank(deployer);
+        address deployedAddress = factory.deploy(admin, salt);
 
         assertEq(deployedAddress,                     expectedAddress);
         assertEq(factory.isInstance(expectedAddress), true);

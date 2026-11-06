@@ -9,9 +9,10 @@ contract AdministeredAgentFactory is IAdministeredAgentFactory {
 
     mapping(address => bool) public isInstance;
 
-    function deploy(address admin) external returns (address administeredAgent) {
+    function deploy(address admin, bytes32 salt) external returns (address administeredAgent) {
+        administeredAgent = address(new AdministeredAgent(admin));
         administeredAgent
-            = address(new AdministeredAgent{ salt: keccak256(abi.encode(msg.sender)) }(admin));
+            = address(new AdministeredAgent{ salt: keccak256(abi.encode(msg.sender, salt)) }(admin));
 
         emit AdministeredAgentDeployed(administeredAgent);
 

@@ -16,8 +16,9 @@ interface IAdministeredAgentFactory {
     /**
      * @notice Deploys a new administered agent.
      * @param  admin             The address of an admin that will control the administered agent.
+     * @param  salt              The salt to use for the deployment.
      * @return administeredAgent The address of the deployed administered agent.
      */
-    function deploy(address admin) external returns (address administeredAgent);
+    function deploy(address admin, bytes32 salt) external returns (address administeredAgent);
 
 }
